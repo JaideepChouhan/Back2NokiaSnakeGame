@@ -1,0 +1,483 @@
+/* Neon terminal style for Back2Nokia - replace your current styles.css */
+/* Black background, neon green borders and text, monospace look */
+:root{
+  --bg:rgb(128, 128, 64)8;
+  --neon:#00ff33; /* bright green */
+  --neon-2:#00cc29;
+  --panel-height:120px;
+  --panel-gap:20px;
+  --max-width:1100px;
+}
+
+html,body{
+  height:100%;
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--neon);
+  font-family: "Courier New", Courier, monospace;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* page container */
+.container{
+  max-width: var(--max-width);
+  margin: 30px auto;
+  padding: 10px;
+}
+
+/* page title */
+.header {
+  text-align:center;
+  padding: 18px 6px;
+  margin-bottom: 18px;
+  border: 2px solid transparent;
+}
+.header h1{
+  margin: 0;
+  letter-spacing: 2px;
+  color: var(--neon);
+  font-size: 32px;
+  text-shadow: 0 0 6px rgba(0,255,51,0.25), 0 0 12px rgba(0,255,51,0.08);
+}
+.brand-logo {
+  display: block;
+  margin: 14px auto;
+  width: 40%;           /* page ke 80% tak chhoti/bori hogi */
+  max-width: 1200px;    /* maximum pixel width */
+  height: auto;         /* aspect ratio preserved */
+}
+@media (max-width:640px) {
+  .brand-logo { width: 92%; }
+}
+
+/* menu list (big panels) */
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--panel-gap);
+}
+
+/* each big clickable panel */
+.menu .panel {
+  background: rgba(0,0,0,0.6);
+  border: 3px solid var(--neon);
+  height: var(--panel-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* inner text */
+.panel .label {
+  color: var(--neon);
+  font-size: 20px;
+  text-align: center;
+  letter-spacing: 2px;
+  text-shadow: 0 0 6px rgba(0,255,51,0.25);
+  user-select: none;
+  padding: 12px 20px;
+}
+
+/* subtle inner double border lines like image */
+.panel::before,
+.panel::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--neon-2), transparent);
+  opacity: 0.18;
+}
+.panel::before { top: 22px; }
+.panel::after { bottom: 22px; }
+
+/* hover/active effects */
+.panel:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 30px rgba(0,255,51,0.08), inset 0 0 30px rgba(0,255,51,0.02);
+  border-color: #66ff88;
+}
+.panel:active { transform: translateY(-1px) scale(.998); }
+
+/* make panels responsive on small screens */
+@media (max-width:600px) {
+  :root { --panel-height:100px; --max-width: 92vw; }
+  .panel .label { font-size: 18px; }
+}
+
+/* small utility for centered forms inside panels (login/register) */
+.form-panel {
+  width: 480px;
+  max-width: 92%;
+  margin: 0 auto;
+  padding: 16px;
+  border: 2px solid rgba(0,255,51,0.08);
+  background: rgba(0,0,0,0.55);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+  color: var(--neon);
+}
+.form-panel label {
+  display:block; margin-bottom:8px; font-size:14px;
+}
+.form-panel input[type="text"],
+.form-panel input[type="password"],
+.form-panel input[type="email"] {
+  width:100%;
+  padding:8px 10px;
+  margin-bottom:12px;
+  background: rgba(0,0,0,0.85);
+  border: 1px solid #0b360b;
+  color: var(--neon);
+  font-family: monospace;
+  outline: none;
+}
+.form-panel button {
+  display:inline-block;
+  background: transparent;
+  color: var(--neon);
+  border: 2px solid var(--neon);
+  padding: 8px 14px;
+  cursor:pointer;
+  font-family: monospace;
+}
+.form-panel button:hover {
+  background: rgba(0,255,51,0.04);
+  box-shadow: 0 0 12px rgba(0,255,51,0.06);
+}
+
+/* small nav at top inside header */
+.header nav {
+  margin-top: 12px;
+  text-align:center;
+}
+.header nav a {
+  color: var(--neon);
+  text-decoration: none;
+  margin: 0 8px;
+  font-size: 14px;
+  padding: 6px 8px;
+  border: 1px solid rgba(0,255,51,0.06);
+}
+.header nav a:hover {
+  border-color: var(--neon);
+  box-shadow: 0 0 8px rgba(0,255,51,0.06);
+}
+
+/* scoreboard small bar for game page */
+.scorebar {
+  margin-top:8px;
+  color: var(--neon);
+  text-align:center;
+  font-size:16px;
+  text-shadow: 0 0 4px rgba(0,255,51,0.06);
+}
+
+/* --- (existing style content) --- */
+/* paste your existing neon theme CSS here (if you already have it). */
+/* Below: Toast / notification styles — append these to your styles.css */
+
+/* toast container fixed at top center */
+#toast-container {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  pointer-events: none;
+}
+
+/* individual toast */
+.toast {
+  min-width: 260px;
+  max-width: 90vw;
+  background: rgba(0,0,0,0.85);
+  border: 2px solid rgba(0,255,51,0.14);
+  color: var(--neon, #00ff33);
+  padding: 12px 16px;
+  border-radius: 6px;
+  box-shadow: 0 6px 30px rgba(0,255,51,0.06), inset 0 0 12px rgba(0,255,51,0.02);
+  font-family: "Courier New", Courier, monospace;
+  letter-spacing: 1px;
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+  transition: opacity 260ms ease, transform 260ms ease;
+  pointer-events: auto;
+  text-align: center;
+}
+
+/* visible state (animation in) */
+.toast.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* success / error variants */
+.toast.success {
+  border-color: #66ff88;
+  color: #b3ffd6;
+}
+.toast.error {
+  border-color: #ff6666;
+  color: #ffd6d6;
+}
+.toast.info {
+  border-color: #66ccff;
+  color: #cfefff;
+}
+
+/* small responsiveness */
+@media (max-width:540px) {
+  #toast-container { top: 8px; }
+  .toast { min-width: 200px; font-size: 14px; padding: 10px 12px; }
+}
+
+
+
+/* Full/neon theme CSS (replace existing or merge) */
+/* --- existing styles (keep your neon theme) --- */
+:root{
+  --bg:#000000;
+  --neon:#00ff33;
+  --neon-2:#00cc29;
+}
+
+html,body{
+  height:100%;
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--neon);
+  font-family: "Courier New", Courier, monospace;
+}
+
+/* Canvas wrapper to show clear neon outline and padding */
+.canvas-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 18px;
+  background: transparent;
+}
+
+/* Make canvas appear with neon border (outer CSS fallback) */
+.canvas-wrapper .game-canvas {
+  background: #000;
+  border-radius: 4px;
+  /* soft glowing neon border in CSS as fallback */
+  box-shadow: 0 0 14px rgba(0,255,51,0.06), inset 0 0 6px rgba(0,255,51,0.02);
+  outline: 2px solid rgba(0,255,51,0.06);
+}
+
+/* If you want bigger neon glow, adjust on hover */
+.canvas-wrapper .game-canvas:hover {
+  box-shadow: 0 0 26px rgba(0,255,51,0.10);
+}
+
+/* Toast styles (if not already present) */
+#toast-container {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  pointer-events: none;
+}
+.toast {
+  min-width: 260px;
+  background: rgba(0,0,0,0.85);
+  border: 2px solid rgba(0,255,51,0.14);
+  color: var(--neon);
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-family: "Courier New", Courier, monospace;
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+  transition: opacity 260ms ease, transform 260ms ease;
+}
+.toast.visible { opacity: 1; transform: translateY(0) scale(1); }
+.toast.success { border-color:#66ff88; color:#b3ffd6; }
+.toast.error { border-color:#ff6666; color:#ffd6d6; }
+
+
+/* Brand logo in header (for JPG) */
+
+/* Update: wider header/logo option
+   Paste/merge these rules into your existing css/styles.css. 
+   Option A (recommended): add class "wide" to the <img> tag to make it a bit wider.
+   Option B: if you prefer to always use the wider size, copy the .brand-logo.wide rules into .brand-logo.
+*/
+
+/* Base brand-logo (unchanged / default size) */
+/* Header: logo left, text right (responsive) */
+/* Add / merge into your existing css/styles.css */
+
+/* container frame (optional neon frame around header) */
+/* --- Add / merge these styles into your css/styles.css --- */
+
+/* Keep the framed logo full-width (frame only contains the image) */
+.fullwidth-header {
+  position: relative;
+  left: 50%;
+  right: 50%;
+  width: 100vw;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  box-sizing: border-box;
+  padding: 18px 0; /* vertical padding for the framed strip */
+  background: rgba(0,0,0,0.08);
+  border-bottom: 0; /* frame bottom not required since title is outside */
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* optional outer glow */
+  box-shadow: 0 22px 80px rgba(0,255,51,0.04), inset 0 0 24px rgba(0,255,51,0.02);
+}
+
+/* Inner container for header content so the image doesn't stretch to edges */
+.fullwidth-header .header-row {
+  width: min(var(--max-width,1100px), 96%);
+  margin: 0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start; /* keep logo left inside the strip; change to center if you want centered */
+}
+
+/* Logo on left inside the framed area */
+.brand-left {
+  display: block;
+  width: auto;
+  max-width: 360px;            /* increase to show larger logo */
+  height: clamp(96px, 14vh, 200px); /* responsive height */
+  object-fit: contain;
+  border-radius: 6px;
+  box-shadow: 0 12px 40px rgba(0,255,51,0.06);
+  flex-shrink: 0;
+}
+
+/* SITE TITLE (outside the box) - centered */
+.site-title {
+  text-align: center;
+  margin: 14px auto 18px auto;
+  padding: 6px 18px;
+  width: 100%;
+}
+
+/* Main neon title centered and prominent */
+.site-title h1 {
+  margin: 0;
+  font-family: "Courier New", Courier, monospace;
+  font-size: clamp(30px, 6.2vw, 64px);   /* responsive big title */
+  color: #bfffd6;
+  letter-spacing: 2px;
+  line-height: 1;
+  text-shadow:
+    0 0 4px rgba(0,255,51,0.95),
+    0 0 12px rgba(0,255,51,0.85),
+    0 0 28px rgba(0,200,50,0.45);
+  -webkit-text-stroke: 0.6px rgba(0,10,0,0.6);
+}
+
+/* subtitle centered below title */
+.site-title .sub {
+  margin-top: 8px;
+  font-size: clamp(11px, 1.6vw, 16px);
+  color: #dfffe8;
+  text-shadow: 0 0 4px rgba(0,255,51,0.18);
+  opacity: 0.95;
+}/* Paste/merge these rules into your css/styles.css */
+/* Styles for the front-page style title used on login (text only) */
+
+.site-title.front-style {
+  text-align: center;
+  margin: 26px auto 10px auto;
+  padding: 6px 18px;
+  width: 100%;
+}
+
+/* Large neon heading (same visual treatment as front page) */
+.site-title.front-style h1 {
+  margin: 0;
+  font-family: "Courier New", Courier, monospace;
+  font-weight: 700;
+  font-size: clamp(36px, 6.2vw, 72px);   /* big and responsive */
+  color: #bfffd6;
+  letter-spacing: 2px;
+  line-height: 1;
+  -webkit-text-stroke: 0.6px rgba(0,10,0,0.6);
+  text-shadow:
+    0 0 4px rgba(0,255,51,0.95),
+    0 0 12px rgba(0,255,51,0.85),
+    0 0 28px rgba(0,200,50,0.45),
+    1px 1px 0 rgba(0,0,0,0.4);
+  transform: translateZ(0);
+  animation: neonFlicker 5.5s linear infinite;
+}
+
+.site-title.front-style .sub {
+  margin-top: 8px;
+  font-size: clamp(12px, 1.6vw, 16px);
+  color: #dfffe8;
+  text-shadow: 0 0 4px rgba(0,255,51,0.18);
+  opacity: 0.95;
+}
+
+/* neon flicker keyframes */
+@keyframes neonFlicker {
+  0% { text-shadow: 0 0 2px rgba(0,255,51,0.95), 0 0 8px rgba(0,255,51,0.85), 0 0 18px rgba(0,200,50,0.6); opacity:1; }
+  4% { text-shadow: 0 0 1px rgba(0,255,51,0.55); opacity:0.96; }
+  7% { text-shadow: 0 0 14px rgba(0,255,51,0.9), 0 0 28px rgba(0,200,50,0.45); opacity:1; }
+  70% { text-shadow: 0 0 8px rgba(0,255,51,0.85), 0 0 18px rgba(0,200,50,0.45); opacity:1; }
+  100% { text-shadow: 0 0 2px rgba(0,255,51,0.95), 0 0 8px rgba(0,255,51,0.85), 0 0 18px rgba(0,200,50,0.6); opacity:1; }
+}
+
+/* keep form panel centered and reasonably sized */
+.container .panel {
+  width: min(820px, 92%);
+  max-width: 820px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.form-panel {
+  width: 520px;
+  max-width: 92%;
+  margin: 0 auto;
+  padding: 18px;
+}
+
+/* responsive tweaks */
+@media (max-width: 760px) {
+  .site-title.front-style h1 { font-size: clamp(22px, 10vw, 36px); }
+  .form-panel { width: 92%; padding: 14px; }
+}
+
+/* If you want the title visually separated from the framed strip, optionally add spacing */
+.fullwidth-header + .site-title {
+  margin-top: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 760px) {
+  .brand-left { max-width: 240px; height: clamp(64px, 18vw, 120px); }
+  .site-title h1 { font-size: clamp(20px, 10vw, 34px); }
+  .site-title .sub { font-size: 12px; }
+}
+/* Place this in your styles.css or in a <style> block */
+
+   

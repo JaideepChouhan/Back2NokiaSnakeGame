@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Login - Back2Nokia</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+</head>
+<body>
+
+  <!-- ONLY THE TEXT TITLE (no logo) -->
+  <div class="site-title front-style">
+    <h1>Back2Nokia</h1>
+    <div class="sub">Login</div>
+    <!-- Add this at the END of your <body> before closing </body> -->
+<a href="index.html" class="menu-btn-fixed" title="Go to Menu">&#8962; Go to Menu</a>
+  </div>
+
+  <div class="container">
+    <div class="panel" style="padding:30px 0; margin-top:18px;">
+      <div class="form-panel" role="form">
+        <form method="post" action="login">
+          <label>Username</label>
+          <input type="text" name="username" required />
+          <label>Password</label>
+          <input type="password" name="password" required />
+          <div style="text-align:center; margin-top:12px;">
+            <button type="submit">Login</button>
+            <a href="register.html" style="margin-left:12px; color:var(--neon); text-decoration:none;">Register</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/notify.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('registered') === '1') {
+      showToast('Registration successful — please login.', 'success', 3500);
+      history.replaceState(null, '', window.location.pathname);
+    }
+    if (params.get('error') === 'invalid') {
+      showToast('Invalid username or password.', 'error', 3500);
+      history.replaceState(null, '', window.location.pathname);
+    }
+  </script>
+  
+</body>
+</html>

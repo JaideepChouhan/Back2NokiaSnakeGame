@@ -1,0 +1,162 @@
+/* demo-game.css (updated: toast placement + visual tweaks)
+   Replace/merge into your css/demo-game.css and hard-refresh (Ctrl+F5).
+*/
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: #000;
+  overflow: hidden;
+  color: var(--neon, #bfffd6);
+  font-family: monospace;
+}
+
+.full-screen-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px 18px 18px;
+}
+
+.site-title.front-style {
+  margin: 6px auto;
+  padding: 4px 8px;
+  text-align: center;
+  z-index: 20;
+}
+
+.demo-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 1200px;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  justify-content: flex-start;
+  font-size: 18px;
+  letter-spacing: 0.6px;
+}
+
+.demo-top .score, .demo-top .status {
+  font-size: 18px;
+  color: var(--neon);
+  margin-right: 6px;
+}
+
+.demo-top .controls button {
+  background: transparent;
+  color: var(--neon, #bfffd6);
+  border: 2px solid rgba(0,255,51,0.85);
+  padding: 8px 12px;
+  margin: 0 4px;
+  cursor: pointer;
+  transition: transform .12s ease;
+  font-size: 15px;
+}
+
+.mode-controls label { font-size: 16px; color: var(--neon); margin-right:6px; }
+.mode-controls select {
+  font-size: 15px;
+  padding: 4px 6px;
+  background: rgba(0,0,0,0.6);
+  color: var(--neon);
+  border: 1px solid rgba(0,255,51,0.45);
+  border-radius: 4px;
+}
+
+#nextInfo {
+  color: var(--neon);
+  font-family: monospace;
+  margin-left: 12px;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+/* Key changes: larger padding so strokes (top/left/right/bottom) are never clipped */
+.canvas-frame {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 1200px;
+  box-sizing: border-box;
+  padding: 22px; /* ensures frame strokes are visible */
+}
+
+/* Ensure the canvas element keeps some breathing room at the bottom */
+canvas.game-canvas {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  border-radius: 6px;
+  box-shadow: 0 14px 40px rgba(0,255,51,0.04);
+  display: block;
+  object-fit: contain;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+
+/* instructions area */
+.instructions {
+  color: #9ffcae;
+  margin-top: 10px;
+  font-family: monospace;
+  opacity: 0.95;
+  font-size: 14px;
+}
+
+/* Feedback / Toast (positioning is set in JS to sit above the game panel center) */
+#feedbackToast {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  padding: 8px 12px;
+  color: #000;
+  font-family: monospace;
+  font-size: 14px;
+  border-radius: 6px;
+  z-index: 1200;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms ease, transform 220ms ease;
+  background: rgba(0,255,51,0.12);
+  border: 1px solid rgba(0,255,51,0.9);
+  text-shadow: none;
+  box-shadow: 0 8px 24px rgba(0,255,51,0.04);
+  min-width: 140px;
+  text-align: center;
+}
+
+/* Error/Incorrect variant */
+#feedbackToast.error {
+  background: rgba(255,120,60,0.10);
+  border-color: rgba(255,120,60,0.95);
+  color: #000;
+}
+
+/* Success variant */
+#feedbackToast.success {
+  background: rgba(0,220,180,0.10);
+  border-color: rgba(0,220,180,0.95);
+  color: #000;
+}
+
+#feedbackToast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Small screens adjustments */
+@media (max-width: 760px) {
+  .demo-top { flex-wrap: wrap; gap: 8px; padding: 6px; font-size: 14px; }
+  .site-title.front-style h1 { font-size: clamp(20px, 6vw, 40px); }
+  #nextInfo { font-size: 13px; }
+  canvas.game-canvas { margin-bottom: 12px; }
+  #feedbackToast { top: 8px; font-size: 13px; padding: 6px 10px; min-width: 96px; }
+}

@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Leaderboard - Back2Nokia</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body { background:#000; color:var(--neon,#bfffd6); font-family:monospace; }
+    .header-neon { text-align:center; margin:20px auto 2px auto; }
+    .header-neon h1 { font-size:48px; font-family:'Courier New',Courier,monospace; font-weight:bold; color:#bfffd6; letter-spacing:2px;
+      text-shadow:0 0 12px #00ff33,0 0 36px #20ff70,0 0 72px #00ff33; margin-bottom:8px; }
+    .header-neon .sub { font-size:20px; color:#dfffe8; text-shadow:0 0 12px #00ff33; opacity:.95; margin-bottom:22px; }
+    .leader-bar { max-width:900px; margin:0 auto; color:var(--neon); text-align:left; }
+    .filter-row { display:flex; align-items:center; gap:14px; margin-bottom:12px; flex-wrap: wrap; }
+    .filter-row label { color:var(--neon); font-weight:600; }
+    .filter-row select { font-size:15px; padding:5px 10px; background:rgba(0,0,0,0.65); color:var(--neon); border:1.3px solid #09da5d; border-radius:4px; }
+    .filter-row button { border:2px solid var(--neon); background:transparent; color:var(--neon); font-size:15px; padding:7px 14px; border-radius:4px; cursor:pointer; }
+    ol#list { margin-top:6px; padding-left:0; list-style:none; }
+    ol#list li { color:var(--neon); margin-bottom:8px; font-size:18px; padding:10px; border-bottom:1px solid rgba(0,255,51,0.04); display:flex; justify-content:space-between; align-items:center; }
+    .loader { display:inline-block; width:22px; height:22px; vertical-align:middle; border:3px solid #3aff84; border-top:3px solid #222; border-radius:50%; animation:spinloader 1.1s linear infinite; margin-bottom:-4px; }
+    @keyframes spinloader {100%{transform:rotate(360deg);} }
+    @media (max-width:700px) { .header-neon h1 { font-size:32px; } .leader-bar, .panel { max-width:98vw; } ol#list li { font-size:15px; } }
+  </style>
+</head>
+<body>
+
+  <div class="header-neon">
+    <h1>Back2Nokia</h1>
+    <div class="sub">Leaderboard (Top-20)</div>
+    <a href="game.html" class="menu-btn-fixed" title="Back to Game">&#8962; Back to Game</a>
+  </div>
+  <a href="index.html" class="menu-btn-fixed" title="Go to Menu">&#8962; Go to Menu</a>
+
+  <div class="panel" style="height:auto; padding:20px 0;">
+    <div class="leader-bar">
+      <div class="filter-row">
+        <label>Subject:
+          <select id="subjectFilter">
+            <option value="">All</option>
+            <option value="classic">Classic</option>
+            <option value="numbers">Counting</option>
+            <option value="alphabets">Alphabets</option>
+            <option value="times-2">Tables 2</option>
+            <option value="times-3">Tables 3</option>
+            <option value="times-4">Tables 4</option>
+            <option value="times-5">Tables 5</option>
+            <option value="times-6">Tables 6</option>
+            <option value="times-7">Tables 7</option>
+            <option value="times-8">Tables 8</option>
+            <option value="times-9">Tables 9</option>
+            <option value="times-10">Tables 10</option>
+          </select>
+        </label>
+
+        <button id="load">Load</button>
+      </div>
+
+      <div id="loadingbox" style="display:none;"><span class="loader"></span> Loading...</div>
+      <ol id="list"></ol>
+    </div>
+  </div>
+
+  <script>
+    // existing helper functions (escapeHtml, aggregateRows, sortAndLimit, render, etc.)
+    // For brevity, reuse the previously supplied client aggregation logic.
+    function escapeHtml(s) {
+      if (!s && s !== 0) return '';
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function getUrl() {
+      const subj = document.getElementById('subjectFilter').value;
+      let url = 'leaderboard';
+      if (subj) url += '?subject=' + encodeURIComponent(subj);
+      return url;
+    }
+
+    function setLoading(v) { document.getElementById('loadingbox').style.display = v ? 'block' : 'none'; }
+
+    function aggregateRows(rows) {
+      const hasTotal = rows.length && typeof rows[0].total_score !== 'undefined';
+      if (hasTotal) {
+        return rows.map(r => ({ username: r.username || '', total_score: Number(r.total_score || 0), last_played: r.last_played || r.created_at || '' }));
+      }
+      const map = new Map();
+      for (const r of rows) {
+        const uname = (r.username || '').trim();
+        const score = Number(r.score || 0);
+        const ts = r.created_at || r.last_played || '';
+        if (!map.has(uname)) map.set(uname, { username: uname, total_score: 0, last_played: ts });
+        const entry = map.get(uname);
+        entry.total_score += isNaN(score) ? 0 : score;
+        if (ts && (!entry.last_played || String(ts) > String(entry.last_played))) entry.last_played = ts;
+      }
+      return Array.from(map.values());
+    }
+
+    function sortAndLimit(arr, limit) {
+      arr.sort((a,b) => {
+        const diff = (b.total_score || 0) - (a.total_score || 0);
+        if (diff !== 0) return diff;
+        if ((b.last_played || '') > (a.last_played || '')) return 1;
+        if ((b.last_played || '') < (a.last_played || '')) return -1;
+        return 0;
+      });
+      return arr.slice(0, limit);
+    }
+
+    function render(listData) {
+      const list = document.getElementById('list');
+      list.innerHTML = '';
+      if (!listData || !listData.length) {
+        list.innerHTML = '<li>No results found.</li>';
+        return;
+      }
+      listData.forEach((it, i) => {
+        const li = document.createElement('li');
+        const left = document.createElement('div');
+        left.innerHTML = '<strong>' + (i+1) + '. ' + escapeHtml(it.username || '') + '</strong>';
+        const right = document.createElement('div');
+        right.innerHTML = '<span style="color:#9ffcae;font-weight:700;">' + (it.total_score || 0) + '</span>' +
+                          (it.last_played ? ' <span style="color:#d0f5c9;margin-left:12px;font-size:13px;">' + escapeHtml(it.last_played) + '</span>' : '');
+        li.appendChild(left);
+        li.appendChild(right);
+        list.appendChild(li);
+      });
+    }
+
+    async function loadLeaderboard() {
+      const url = getUrl();
+      setLoading(true);
+      try {
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        const aggregated = aggregateRows(Array.isArray(data) ? data : []);
+        const finalList = sortAndLimit(aggregated, 20);
+        render(finalList);
+      } catch (err) {
+        console.error('leaderboard load error', err);
+        document.getElementById('list').innerHTML = '<li><span style="color:#ff6060;">Error loading data</span></li>';
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    document.getElementById('load').addEventListener('click', loadLeaderboard);
+    document.getElementById('subjectFilter').addEventListener('change', loadLeaderboard);
+
+    // Listen for localStorage events triggered by game.js when a score is saved
+    window.addEventListener('storage', function(e) {
+      if (!e) return;
+      if (e.key === 'leaderboard-refresh') {
+        // call loadLeaderboard to refresh the view
+        try {
+          if (typeof loadLeaderboard === 'function') loadLeaderboard();
+        } catch (err) {
+          console.error('Error refreshing leaderboard from storage event', err);
+        }
+      }
+    });
+
+    // Also: if the game in the same tab sets localStorage, the storage event won't fire in same tab.
+    // So optionally you can also check on visibility change or poll, but the saveScore() in game.js
+    // already sets localStorage and you can also call loadLeaderboard() directly if save happens in same page.
+    // Initial load:
+    loadLeaderboard();
+  </script>
+
+</body>
+</html>

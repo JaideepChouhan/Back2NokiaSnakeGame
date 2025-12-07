@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Back2Nokia</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/demo-game.css" />
+</head>
+<body>
+
+  <!-- Header / Title -->
+  <div class="site-title front-style" id="siteHeader">
+    <h1>Back2Nokia</h1>
+   <!-- Add this at the END of your <body> before closing </body> -->
+<a href="index.html" class="menu-btn-fixed" title="Go to Menu">&#8962; Go to Menu</a>
+  </div>
+
+  <div class="demo-wrap full-screen-container">
+    <div class="demo-top" id="demoTop">
+      <div class="score">Score: <span id="scoreVal">0</span></div>
+      <div class="status" id="statusVal">Ready</div>
+
+      <div class="controls">
+        <button id="startBtn">Start</button>
+        <button id="pauseBtn">Pause</button>
+        <button id="resetBtn">Reset</button>
+        <button id="saveBtn">Save Score</button>
+
+        <!-- Leaderboard button for logged-in page -->
+        <button id="leaderboardBtn" style="display:none;">Leaderboard</button>
+      </div>
+
+      <div class="mode-controls" style="display:flex;align-items:center;gap:10px;margin-left:18px;">
+        <label style="color:var(--neon)">Game Mode:</label>
+        <select id="gameMode" aria-label="Game mode">
+          <option value="classic">Classic</option>
+          <option value="numbers">Counting</option>
+          <option value="alphabets">Alphabets</option>
+          <option value="times">Tables</option>
+        </select>
+
+        <select id="tableSelect" aria-label="Times table" style="display:none;"></select>
+
+        <div id="nextInfo" style="color:var(--neon); font-family:monospace; margin-left:12px;"></div>
+      </div>
+    </div>
+
+    <div class="canvas-frame" id="canvasFrame">
+      <canvas id="board" width="900" height="520" aria-label="Game board" class="game-canvas"></canvas>
+    </div>
+
+    <div class="instructions">
+      Use arrow keys to move. In Counting/Alphabets/Times modes collect the correct item. Incorrect picks penalize score.
+    </div>
+  </div>
+
+  <div id="feedbackToast" aria-hidden="true"></div>
+
+ 
+ 
+  <!-- Add this snippet near the end of <body> in game.html, before the main game script -->
+<script src="js/welcome.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>

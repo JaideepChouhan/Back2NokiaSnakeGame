@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Register - Back2Nokia</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    .header-neon {
+      text-align: center;
+      margin: 28px auto 2px auto;
+    }
+    .header-neon h1 {
+      font-size: 48px;
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      color: #bfffd6;
+      letter-spacing: 2px;
+      text-shadow:
+        0 0 12px #00ff33,
+        0 0 36px #20ff70,
+        0 0 72px #00ff33;
+      margin-bottom: 8px;
+    }
+    .header-neon .sub {
+      font-size: 23px;
+      color: #dfffe8;
+      text-shadow: 0 0 12px #00ff33;
+      opacity: .96;
+      margin-bottom: 26px;
+    }
+    @media (max-width:700px) {
+      .header-neon h1 { font-size:30px; }
+      .header-neon .sub { font-size:17px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-neon">
+      <h1>Back2Nokia</h1>
+      <div class="sub">Create account</div>
+      <!-- Add this at the END of your <body> before closing </body> -->
+<a href="index.html" class="menu-btn-fixed" title="Go to Menu">&#8962; Go to Menu</a>
+    </div>
+    <div class="panel" style="height:auto; padding:28px 0;">
+      <div class="form-panel">
+        <form method="post" action="register">
+          <label>Username</label>
+          <input type="text" name="username" required />
+          <label>Email</label>
+          <input type="email" name="email" />
+          <label>Password</label>
+          <input type="password" name="password" required />
+          <div style="text-align:center; margin-top:8px;">
+            <button type="submit">Register</button>
+            <a href="login.html" style="margin-left:12px; color:var(--neon); text-decoration:none;">Login</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
