@@ -332,6 +332,8 @@
         if (foodSingle && head.x === foodSingle.x && head.y === foodSingle.y) {
           score += 10;
           showFeedback('Correct!', 'success', 900);
+          // Play eat sound effect
+          if (typeof GameSounds !== 'undefined') GameSounds.playEatSound();
           updateScore();
           spawnClassic();
           return true;
@@ -344,6 +346,11 @@
             if (it.correct) {
               score += 10;
               showFeedback('Correct!', 'success', 900);
+              // Play correct answer sound (includes eat sound)
+              if (typeof GameSounds !== 'undefined') {
+                GameSounds.playEatSound();
+                GameSounds.playCorrectSound();
+              }
               if (mode === 'numbers') {
                 currentTarget++;
                 if (currentTarget > 100) { setStatus('Done!'); gameOver = true; stop(); }
@@ -360,6 +367,8 @@
               if (mode === 'numbers') showFeedback('Incorrect number!', 'error', 1400);
               else if (mode === 'alphabets') showFeedback('Incorrect letter!', 'error', 1400);
               else if (mode === 'times') showFeedback('Incorrect value!', 'error', 1400);
+              // Play wrong answer sound
+              if (typeof GameSounds !== 'undefined') GameSounds.playWrongSound();
               score = Math.max(0, score - 5);
               if (mode === 'numbers') spawnPairNumbers();
               else if (mode === 'alphabets') spawnPairAlphabets();
@@ -382,6 +391,11 @@
         if (head.x < 0 || head.x >= maxX || head.y < 0 || head.y >= maxY) {
           gameOver = true;
           setStatus('Game Over');
+          // Play game over sound and stop music
+          if (typeof GameSounds !== 'undefined') {
+            GameSounds.playGameOverSound();
+            GameSounds.stopAllMusic();
+          }
           stop();
           draw();
           return;
@@ -395,6 +409,11 @@
         if (snake[i].x === head.x && snake[i].y === head.y) {
           gameOver = true;
           setStatus('Game Over');
+          // Play game over sound and stop music
+          if (typeof GameSounds !== 'undefined') {
+            GameSounds.playGameOverSound();
+            GameSounds.stopAllMusic();
+          }
           stop();
           draw();
           return;
@@ -524,6 +543,13 @@
       if (countdownRunning) return;
       if (gameOver) resetGame();
 
+      // Initialize sound system and start game music
+      if (typeof GameSounds !== 'undefined') {
+        GameSounds.init();
+        GameSounds.playGameStartSound();
+        GameSounds.playGameMusic();
+      }
+
       countdownRunning = true;
       countdownEndTs = Date.now() + COUNTDOWN_START * COUNTDOWN_STEP_MS;
       setStatus('Get Ready');
@@ -541,9 +567,16 @@
           intervalId = setInterval(step, TICK);
           setStatus('Running');
           if (pauseBtn) pauseBtn.textContent = 'Pause';
+          // Play final countdown beep
+          if (typeof GameSounds !== 'undefined') GameSounds.playCountdownBeep(true);
           draw();
           return;
         } else {
+          // Play countdown beep for each number
+          const prevTicks = Math.ceil((countdownEndTs - Date.now() + COUNTDOWN_STEP_MS) / COUNTDOWN_STEP_MS);
+          if (prevTicks !== ticksRemaining && typeof GameSounds !== 'undefined') {
+            GameSounds.playCountdownBeep(false);
+          }
           drawCountdownNumber(ticksRemaining);
           rafId = requestAnimationFrame(rafLoop);
         }

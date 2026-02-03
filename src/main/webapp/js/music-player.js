@@ -1,43 +1,69 @@
-// Music player for Back2Nokia
+// Music player for Back2Nokia - Enhanced with GameSounds integration
 document.addEventListener('DOMContentLoaded', function() {
   // Create music player HTML
   const musicPlayer = document.createElement('div');
   musicPlayer.className = 'music-player';
   musicPlayer.innerHTML = `
-    <button id="playPauseBtn" class="music-btn">♪</button>
-    <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="50">
+    <button id="playPauseBtn" class="music-btn" title="Toggle Music">♪</button>
+    <button id="soundFxBtn" class="music-btn" title="Toggle Sound Effects" style="font-size: 14px;">🔊</button>
+    <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="50" title="Volume">
   `;
   
   document.body.appendChild(musicPlayer);
   
-  // Create audio element
+  // Create audio element for background music
   const audio = new Audio();
   
-  // Set audio source - you need to add your own music file
-  // For now, using a placeholder. Replace with your actual music file
-  audio.src = 'audio/background-music.mp3'; // Add your music file in audio folder
+  // Set audio source - menu/idle music
+  audio.src = 'audio/background-music.mp3';
   audio.loop = true;
-  audio.volume = 0.8; // Start at 50% volume
+  audio.volume = 0.4;
   
   const playPauseBtn = document.getElementById('playPauseBtn');
+  const soundFxBtn = document.getElementById('soundFxBtn');
   const volumeSlider = document.getElementById('volumeSlider');
   
-  let isPlaying = false;
+  let isMusicPlaying = false;
+  let isSoundFxEnabled = true;
+
+  // Initialize GameSounds if available
+  function initGameSounds() {
+    if (typeof GameSounds !== 'undefined') {
+      GameSounds.init();
+      isSoundFxEnabled = !GameSounds.isSoundMuted();
+      updateSoundFxButton();
+    }
+  }
+
+  // Update sound effects button appearance
+  function updateSoundFxButton() {
+    if (soundFxBtn) {
+      soundFxBtn.textContent = isSoundFxEnabled ? '🔊' : '🔇';
+      soundFxBtn.title = isSoundFxEnabled ? 'Sound Effects: ON' : 'Sound Effects: OFF';
+    }
+  }
+
+  // Try to autoplay menu music (modern browsers require user interaction)
+  function tryAutoplay() {
+    audio.play().then(() => {
+      isMusicPlaying = true;
+      playPauseBtn.classList.add('active');
+      playPauseBtn.textContent = '⏸';
+    }).catch(error => {
+      console.log('Autoplay prevented. User needs to interact first.');
+      isMusicPlaying = false;
+      playPauseBtn.textContent = '♪';
+    });
+  }
+
+  // Delay autoplay attempt slightly
+  setTimeout(tryAutoplay, 500);
   
-  // Try to autoplay (modern browsers require user interaction)
-  audio.play().then(() => {
-    isPlaying = true;
-    playPauseBtn.classList.add('active');
-    playPauseBtn.textContent = '⏸';
-  }).catch(error => {
-    console.log('Autoplay prevented. User needs to interact first.');
-    isPlaying = false;
-    playPauseBtn.textContent = '♪';
-  });
-  
-  // Play/Pause button
+  // Play/Pause button for background music
   playPauseBtn.addEventListener('click', function() {
-    if (isPlaying) {
+    initGameSounds();
+    
+    if (isMusicPlaying) {
       audio.pause();
       playPauseBtn.classList.remove('active');
       playPauseBtn.textContent = '♪';
@@ -46,16 +72,39 @@ document.addEventListener('DOMContentLoaded', function() {
         playPauseBtn.classList.add('active');
         playPauseBtn.textContent = '⏸';
       }).catch(error => {
-        // If play fails, show message
         alert('Please interact with the page first, then click play.');
       });
     }
-    isPlaying = !isPlaying;
+    isMusicPlaying = !isMusicPlaying;
+  });
+
+  // Sound effects toggle button
+  soundFxBtn.addEventListener('click', function() {
+    initGameSounds();
+    
+    if (typeof GameSounds !== 'undefined') {
+      isSoundFxEnabled = !GameSounds.toggleMute();
+      updateSoundFxButton();
+      
+      // Play a click sound if enabled (to confirm it's working)
+      if (isSoundFxEnabled) {
+        GameSounds.playClickSound();
+      }
+    } else {
+      isSoundFxEnabled = !isSoundFxEnabled;
+      updateSoundFxButton();
+    }
   });
   
-  // Volume slider
+  // Volume slider - controls both music and sound effects
   volumeSlider.addEventListener('input', function() {
-    audio.volume = this.value / 100;
+    const volume = this.value / 100;
+    audio.volume = volume * 0.8; // Music slightly quieter
+    
+    // Also update GameSounds volume
+    if (typeof GameSounds !== 'undefined') {
+      GameSounds.setVolume(volume);
+    }
   });
   
   // Save volume preference to localStorage
@@ -67,16 +116,44 @@ document.addEventListener('DOMContentLoaded', function() {
   const savedVolume = localStorage.getItem('gameVolume');
   if (savedVolume) {
     volumeSlider.value = savedVolume;
-    audio.volume = savedVolume / 100;
+    audio.volume = (savedVolume / 100) * 0.8;
+    
+    if (typeof GameSounds !== 'undefined') {
+      GameSounds.setVolume(savedVolume / 100);
+    }
   }
   
   // Pause music when page is hidden
   document.addEventListener('visibilitychange', function() {
-    if (document.hidden && isPlaying) {
+    if (document.hidden && isMusicPlaying) {
       audio.pause();
       playPauseBtn.classList.remove('active');
       playPauseBtn.textContent = '♪';
-      isPlaying = false;
+      isMusicPlaying = false;
     }
   });
+
+  // Stop menu music when game starts (game.js will play game music)
+  window.addEventListener('gameStarted', function() {
+    audio.pause();
+    isMusicPlaying = false;
+    playPauseBtn.classList.remove('active');
+    playPauseBtn.textContent = '♪';
+  });
+
+  // Resume menu music when game ends
+  window.addEventListener('gameEnded', function() {
+    if (!isMusicPlaying) {
+      audio.currentTime = 0;
+      audio.play().then(() => {
+        isMusicPlaying = true;
+        playPauseBtn.classList.add('active');
+        playPauseBtn.textContent = '⏸';
+      }).catch(() => {});
+    }
+  });
+
+  // Initialize on first interaction
+  document.addEventListener('click', initGameSounds, { once: true });
+  document.addEventListener('keydown', initGameSounds, { once: true });
 });

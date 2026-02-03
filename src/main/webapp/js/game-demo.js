@@ -391,6 +391,8 @@
         if (foodSingle && head.x === foodSingle.x && head.y === foodSingle.y) {
           score += 10;
           showFeedback('Correct!', 'success', 900);
+          // Play eat sound effect
+          if (typeof GameSounds !== 'undefined') GameSounds.playEatSound();
           updateScore();
           spawnClassic();
           return true;
@@ -400,9 +402,14 @@
         for (let i = 0; i < items.length; i++) {
           const it = items[i];
           if (it.x === head.x && it.y === head.y) {
-            if (it.correct) {
+          if (it.correct) {
               score += 10;
               showFeedback('Correct!', 'success', 900);
+              // Play correct answer sound (includes eat sound)
+              if (typeof GameSounds !== 'undefined') {
+                GameSounds.playEatSound();
+                GameSounds.playCorrectSound();
+              }
               if (mode === 'numbers') {
                 currentTarget++;
                 if (currentTarget > 100) { setStatus('Done!'); gameOver = true; stop(); }
@@ -419,6 +426,8 @@
               if (mode === 'numbers') showFeedback('Incorrect number!', 'error', 1400);
               else if (mode === 'alphabets') showFeedback('Incorrect letter!', 'error', 1400);
               else if (mode === 'times') showFeedback('Incorrect value!', 'error', 1400);
+              // Play wrong answer sound
+              if (typeof GameSounds !== 'undefined') GameSounds.playWrongSound();
               score = Math.max(0, score - 5);
               if (mode === 'numbers') spawnPairNumbers();
               else if (mode === 'alphabets') spawnPairAlphabets();
@@ -441,6 +450,11 @@
         if (head.x < 0 || head.x >= maxX || head.y < 0 || head.y >= maxY) {
           gameOver = true;
           setStatus('Game Over');
+          // Play game over sound and stop music
+          if (typeof GameSounds !== 'undefined') {
+            GameSounds.playGameOverSound();
+            GameSounds.stopAllMusic();
+          }
           stop();
           drawGame();
           return;
@@ -454,6 +468,11 @@
         if (snake[i].x === head.x && snake[i].y === head.y) {
           gameOver = true;
           setStatus('Game Over');
+          // Play game over sound and stop music
+          if (typeof GameSounds !== 'undefined') {
+            GameSounds.playGameOverSound();
+            GameSounds.stopAllMusic();
+          }
           stop();
           drawGame();
           return;
@@ -517,6 +536,13 @@
       if (countdownRunning) return;
       if (gameOver) resetGame();
 
+      // Initialize sound system and start game music
+      if (typeof GameSounds !== 'undefined') {
+        GameSounds.init();
+        GameSounds.playGameStartSound();
+        GameSounds.playGameMusic();
+      }
+
       countdownRunning = true;
       countdownStartValue = COUNTDOWN_START;
       countdownEndTs = Date.now() + COUNTDOWN_START * COUNTDOWN_STEP_MS;
@@ -532,6 +558,8 @@
         if (ticksRemaining <= 0) {
           // end countdown
           countdownRunning = false;
+          // Play final countdown beep
+          if (typeof GameSounds !== 'undefined') GameSounds.playCountdownBeep(true);
           // start actual game ticks
           paused = false;
           if (intervalId) clearInterval(intervalId);
@@ -542,6 +570,11 @@
           drawGame();
           return;
         } else {
+          // Play countdown beep for each number change
+          const prevTicks = Math.ceil((countdownEndTs - Date.now() + COUNTDOWN_STEP_MS) / COUNTDOWN_STEP_MS);
+          if (prevTicks !== ticksRemaining && typeof GameSounds !== 'undefined') {
+            GameSounds.playCountdownBeep(false);
+          }
           drawCountdownNumber(ticksRemaining);
           // schedule next RAF
           rafId = requestAnimationFrame(rafLoop);
